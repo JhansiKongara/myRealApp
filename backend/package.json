@@ -1,0 +1,27 @@
+{
+  "name": "myrealapp",
+  "version": "1.0.0",
+  "description": "this server provides rest API's for MyRealApp.",
+  "main": "server.js",
+  "scripts": {
+    "test": "jest",
+    "start": "node server.js"
+  },
+  "keywords": [
+    "myRealApp"
+  ],
+  "author": "Raja",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "nodemon": "^3.1.7",
+    "pg": "^8.13.1",
+    "redis": "^4.7.0",
+    "sequelize": "^6.37.5",
+    "winston": "^3.17.0"
+  }
+}
