@@ -4,8 +4,10 @@
   "description": "this server provides rest API's for MyRealApp.",
   "main": "server.js",
   "scripts": {
+    "start": "node server.js",
+    "dev": "NODE_ENV=development nodemon server.js",
     "test": "jest",
-    "start": "node server.js"
+    "lint": "eslint . --fix"
   },
   "keywords": [
     "myRealApp"
@@ -18,6 +20,7 @@
     "express": "^4.21.2",
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "nodemon": "^3.1.7",
     "pg": "^8.13.1",
     "redis": "^4.7.0",
