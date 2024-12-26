@@ -1,0 +1,28 @@
+name: ESLint (Backend)
+
+on:
+  push:
+    branches:
+      - main # Trigger on push to the main branch (or any other branch you choose)
+  pull_request:
+    branches:
+      - main # Trigger on PR to the main branch
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run ESLint on backend
+        run: npx eslint ./backend --config ./backend/.eslintrc.json # Run ESLint on the 'backend' folder
