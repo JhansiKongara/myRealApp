@@ -1,9 +1,6 @@
-name: Lint and CodeQL Analysis
+name: ESLint Workflow
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -13,44 +10,18 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Install dependencies
-      run: |
-        cd backend
-        npm install
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18"
 
-    - name: Run ESLint
-      run: |
-        cd backend
-        npx eslint . --format json --output-file eslint-results.json
+      - name: Install dependencies
+        run: |
+          npm install --only=dev
 
-    - name: Upload ESLint Results (Optional)
-      uses: actions/upload-artifact@v3
-      with:
-        name: eslint-results
-        path: backend/eslint-results.json
-
-  analyze:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
-
-    - name: Set up CodeQL
-      uses: github/codeql-action/init@v3
-      with:
-        languages: javascript-typescript
-
-    - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v3
-      with:
-        category: 'javascript-analysis'  # Unique category for analysis
-
-    - name: Upload CodeQL SARIF Results
-      uses: github/codeql-action/upload-sarif@v3
-      with:
-        sarif_file: '/home/runner/work/myRealApp/results/javascript.sarif'
-        category: 'javascript-upload'  # Unique category for upload
+      - name: Run ESLint
+        run: |
+          npx eslint . --format=github-action
