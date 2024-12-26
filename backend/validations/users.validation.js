@@ -1,12 +1,15 @@
 const Joi = require("joi");
+const { logger } = require("../services/logger.service");
 
 /**
  * Validates user data for registration.
  *
  * @param {Object} params - The input parameters.
- * @param {Object} params.user - The user object containing details like userName, email, password, etc.
+ * @param {Object} params.user
+ * - The user object containing details like userName, email, password, etc.
  * @returns {Object} - The validated user data.
- * @throws Will throw an error if validation fails or if the user role creation is not permitted.
+ * @throws Will throw an error if validation fails or if
+ * the user role creation is not permitted.
  */
 function validateUser({ user }) {
   const schema = Joi.object({
@@ -38,8 +41,9 @@ function validateUser({ user }) {
     (loggedUserRole && loggedUserRole !== "admin") ||
     ["admin", "sub_admin"].includes(role)
   ) {
-    console.warn(
-      `⚠️  Access Denied: Attempt to create '${role}' User by '${loggedUserRole}'`
+    logger.warn(
+      `⚠️  Access Denied: Attempt to create '${role}' 
+      User by '${loggedUserRole}'`
     );
     throw new Error(
       `You don't have access to create '${role}' User. Please contact support.`
@@ -47,11 +51,11 @@ function validateUser({ user }) {
   }
 
   if (error) {
-    console.error(`❌  Validation Error: ${error.message}`);
+    logger.error(`❌  Validation Error: ${error.message}`);
     throw error;
   }
 
-  console.info(`✔️  User validation successful for: ${value?.userName}`);
+  logger.info(`✔️  User validation successful for: ${value?.userName}`);
   return value;
 }
 
@@ -59,7 +63,8 @@ function validateUser({ user }) {
  * Validates user data for login.
  *
  * @param {Object} params - The input parameters.
- * @param {Object} params.user - The user object containing details like email, phoneNumber, and password.
+ * @param {Object} params.user
+ * - The user object containing details like email, phoneNumber, and password.
  * @returns {Object} - The validated login data.
  * @throws Will throw an error if validation fails.
  */
@@ -88,11 +93,11 @@ function validateUserLogin({ user }) {
   const { error, value } = schema.validate(user);
 
   if (error) {
-    console.error(`❌  Login Validation Error: ${error.message}`);
+    logger.error(`❌  Login Validation Error: ${error.message}`);
     throw error;
   }
 
-  console.info(
+  logger.info(
     `✔️  Login validation successful for: ${value.email || value.phoneNumber}`
   );
   return value;

@@ -1,6 +1,8 @@
 /**
- * @fileoverview This module handles database-related errors, providing specific error messages
- * for known cases such as unique constraint violations and invalid role entries.
+ * @fileoverview This module handles database-related errors,
+ * providing specific error messages
+ * for known cases such as unique constraint violations
+ * and invalid role entries.
  */
 
 /**
@@ -38,12 +40,11 @@ function handleError({ error }) {
 Please select these listed roles only: owner, agent, buyer, seller`,
       error,
     };
-  } else {
-    return {
-      message: "Failed to create user!",
-      error,
-    };
   }
+  return {
+    message: "Failed to create user!",
+    error,
+  };
 }
 
 module.exports = { handleError };

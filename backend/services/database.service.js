@@ -1,9 +1,11 @@
 const { pgPool } = require("../config/db");
 const { createUserQuery, fetchUserQuery } = require("./dbQuery.service");
+const { logger } = require("./logger.service");
 
 /**
- * @fileoverview This module provides database management functions, including connecting to the database,
- * creating a new user, and fetching user details.
+ * @fileoverview This module provides database management functions,
+ * including connecting to the database. creating a new user,
+ *  and fetching user details.
  */
 
 /**
@@ -14,12 +16,12 @@ const { createUserQuery, fetchUserQuery } = require("./dbQuery.service");
  * @async
  * @throws Will throw an error if the connection to the database fails.
  */
-async function managedDbConnection() {
+async function manageDbConnection() {
   try {
     await pgPool.connect();
-    console.info(`✔️  Connected Db Successfully!`);
+    logger.info(`✔️  Connected Db Successfully!`);
   } catch (error) {
-    console.error(`❌  Failed to Connect Db!, Error: ${error?.message}`);
+    logger.error(`❌  Failed to Connect Db!, Error: ${error?.message}`);
     throw error;
   }
 }
@@ -32,9 +34,11 @@ async function managedDbConnection() {
  * @param {string} user.userName - The name of the user.
  * @param {string} user.email - The email address of the user.
  * @param {string} user.hashedPassword - The hashed password of the user.
- * @param {string} user.role - The role assigned to the user (e.g., admin, user).
+ * @param {string} user.role
+ * - The role assigned to the user (e.g., admin, user).
  * @param {string} user.phoneNumber - The phone number of the user.
- * @returns {Object} - A confirmation object containing userId, userName, email, and phoneNumber.
+ * @returns {Object}
+ * - A confirmation object containing userId, userName, email, and phoneNumber.
  * @throws Will throw an error if the user creation fails.
  */
 async function createUser({
@@ -48,10 +52,10 @@ async function createUser({
     const parameters = [userName, email, hashedPassword, role, phoneNumber];
     const { rows } = await pgPool.query(createUserQuery, parameters);
     const userId = rows[0].userId;
-    console.info(`✔️  User created Successfully with userId: ${userId}`);
+    logger.info(`✔️  User created Successfully with userId: ${userId}`);
     return { userId, userName, email, phoneNumber };
   } catch (error) {
-    console.error(`❌  Failed to Create User!, Error: ${error?.message}`);
+    logger.error(`❌  Failed to Create User!, Error: ${error?.message}`);
     throw error;
   }
 }
@@ -71,12 +75,12 @@ async function fetchUser({ email, phoneNumber }) {
     const parameters = [email, phoneNumber];
     const { rows } = await pgPool.query(fetchUserQuery, parameters);
     const userData = rows[0];
-    console.info(`✔️  User details fetched Successfully`);
+    logger.info(`✔️  User details fetched Successfully`);
     return userData;
   } catch (error) {
-    console.error(`❌  Failed to fetch User!, Error: ${error?.message}`);
+    logger.error(`❌  Failed to fetch User!, Error: ${error?.message}`);
     throw error;
   }
 }
 
-module.exports = { managedDbConnection, createUser, fetchUser };
+module.exports = { manageDbConnection, createUser, fetchUser };

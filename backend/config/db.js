@@ -1,8 +1,10 @@
 const { Pool } = require("pg");
 
 /**
- * @fileoverview This module exports a PostgreSQL connection pool instance using the `pg` library.
- * The pool is configured using environment variables for secure database connection settings.
+ * @fileoverview This module exports a PostgreSQL connection
+ * pool instance using the `pg` library.
+ * The pool is configured using environment
+ * variables for secure database connection settings.
  */
 
 /**
@@ -21,7 +23,8 @@ const { Pool } = require("pg");
  * @property {number} port - Port number of the database.
  * @property {string} database - Name of the database.
  * @property {string} user - Database username.
- * @property {number} maxUses - Limits the number of times a connection can be used.
+ * @property {number} maxUses
+ * - Limits the number of times a connection can be used.
  */
 const pgPool = new Pool({
   host: process.env.DB_HOST,
