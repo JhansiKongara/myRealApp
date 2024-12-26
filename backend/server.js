@@ -38,27 +38,27 @@ redisClient.on("error", (err) => {
 });
 
 // JWT authentication middleware
-// function isAuthorizedReq(req, res, next) {
-//   const token = req.header("Authorization");
-//   if (!token) {
-//     console.warn(
-//       `⚠️  Token not provided in request: ${req?.method} ${req?.originalUrl}`
-//     );
-//     return res.status(403).json({ message: "Access denied" });
-//   }
+function isAuthorizedReq(req, res, next) {
+  const token = req.header("Authorization");
+  if (!token) {
+    logger.warn(
+      `⚠️  Token not provided in request: ${req?.method} ${req?.originalUrl}`
+    );
+    return res.status(403).json({ message: "Access denied" });
+  }
 
-//   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-//     if (err) {
-//       console.warn(
-//         `⚠️  Invalid token for request: ${req?.method} ${req?.originalUrl}`
-//       );
-//       return res.status(403).json({ message: "Invalid token" });
-//     }
-//     req.user = user;
-//     return next();
-//   });
-//   return null;
-// }
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      logger.warn(
+        `⚠️  Invalid token for request: ${req?.method} ${req?.originalUrl}`
+      );
+      return res.status(403).json({ message: "Invalid token" });
+    }
+    req.user = user;
+    return next();
+  });
+  return null;
+}
 
 // Use routes
 app.use("/", appRouter);
