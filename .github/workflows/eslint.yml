@@ -3,10 +3,12 @@ name: ESLint (Backend)
 on:
   push:
     branches:
-      - main # Trigger on push to the main branch (or any other branch you choose)
+      - main
+      - develop # You can also add the develop branch here
   pull_request:
     branches:
-      - main # Trigger on PR to the main branch
+      - main
+      - develop
 
 jobs:
   lint:
@@ -19,10 +21,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: "18"
+
+      - name: Navigate to backend directory
+        run: cd backend
 
       - name: Install dependencies
-        run: npm install
+        run: |
+          cd backend
+          npm install --only=dev
 
       - name: Run ESLint on backend
-        run: npx eslint ./backend --config ./backend/.eslintrc.json # Run ESLint on the 'backend' folder
+        run: |
+          cd backend
+          npx eslint . --config .eslintrc.json  # Ensure ESLint runs inside the 'backend' folder
