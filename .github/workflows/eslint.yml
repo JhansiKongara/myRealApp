@@ -34,4 +34,4 @@ jobs:
       - name: Run ESLint on backend
         run: |
           cd backend
-          npx eslint . --config ./.eslintrc.json  # Ensure ESLint runs inside the 'backend' folder
+          npx eslint . --config .eslintrc.json  # Ensure ESLint runs inside the 'backend' folder
