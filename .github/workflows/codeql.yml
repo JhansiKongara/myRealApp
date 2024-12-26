@@ -1,4 +1,4 @@
-name: ESLint Workflow
+name: ESLint (Backend)
 
 on:
   pull_request:
@@ -18,10 +18,15 @@ jobs:
         with:
           node-version: "18"
 
+      - name: Navigate to backend directory
+        run: cd backend
+
       - name: Install dependencies
         run: |
+          cd backend
           npm install --only=dev
 
-      - name: Run ESLint
+      - name: Run ESLint on backend
         run: |
-          npx eslint . --format=github-action
+          cd backend
+          npx eslint . --config .eslintrc.json --format=github-action # Ensures ESLint results are displayed in GitHub Checks
