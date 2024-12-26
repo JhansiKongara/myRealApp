@@ -1,4 +1,4 @@
-name: CodeQL Analysis
+name: Lint and CodeQL Analysis
 
 on:
   push:
@@ -9,6 +9,29 @@ on:
       - main
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        npm install
+
+    - name: Run ESLint
+      run: |
+        cd backend
+        npx eslint . --format json --output-file eslint-results.json
+
+    - name: Upload ESLint Results (Optional)
+      uses: actions/upload-artifact@v3
+      with:
+        name: eslint-results
+        path: backend/eslint-results.json
+
   analyze:
     runs-on: ubuntu-latest
 
