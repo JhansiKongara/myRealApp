@@ -3,7 +3,7 @@ name: Create PR on Commit
 on:
   push:
     branches:
-      - develop # Trigger on commits to the 'develop' branch
+      - develop  # Trigger on commits to the 'develop' branch
 
 permissions:
   contents: write
@@ -26,24 +26,33 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open',
-              head: `${context.repo.owner}:develop`, // Check for PRs from 'develop' branch
-              base: 'main' // Destination branch
+              head: `${context.repo.owner}:develop`,
+              base: 'main'
             });
 
             core.setOutput('pr_exists', prs.length > 0 ? 'true' : 'false');
+            if (prs.length > 0) {
+              console.log(`Existing PR found: ${prs[0].html_url}`);
+            } else {
+              console.log('No existing PR found.');
+            }
 
       - name: Create Pull Request
         if: steps.check_pr.outputs.pr_exists == 'false'
         id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: develop # Source branch
-          base: main # Destination branch
-          title: "Merge develop into main"
-          body: "This PR was automatically created to merge changes from develop into main."
-          labels: "automated"
+          branch: develop  # Source branch
+          base: main       # Destination branch
+          title: 'Merge develop into main'
+          body: 'This PR was automatically created to merge changes from develop into main.'
+          labels: 'automated'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Debug PR Number
+        if: steps.check_pr.outputs.pr_exists == 'false'
+        run: echo "Pull Request Number: ${{ steps.create_pr.outputs.pull_request_number }}"
 
       - name: Add Labels to the Pull Request
         if: steps.check_pr.outputs.pr_exists == 'false'
@@ -54,6 +63,7 @@ jobs:
             if (!prNumber || prNumber === 0) {
               throw new Error('Pull request number is invalid.');
             }
+            console.log(`Adding labels to PR #${prNumber}`);
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -70,9 +80,10 @@ jobs:
             if (!prNumber || prNumber === 0) {
               throw new Error('Pull request number is invalid.');
             }
+            console.log(`Assigning reviewer to PR #${prNumber}`);
             await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber,
-              reviewers: ['JhansiKongara']  // Assigning reviewer
+              reviewers: ['JhansiKongara']
             });
