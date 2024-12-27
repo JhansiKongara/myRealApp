@@ -37,6 +37,10 @@ jobs:
               console.log('No existing PR found.');
             }
 
+      - name: Debug PR Creation Logic
+        run: |
+          echo "pr_exists: ${{ steps.check_pr.outputs.pr_exists }}"
+
       - name: Create Pull Request
         if: steps.check_pr.outputs.pr_exists == 'false'
         id: create_pr
@@ -53,4 +57,4 @@ jobs:
       - name: Debug PR Number
         if: steps.check_pr.outputs.pr_exists == 'false'
         run: |
-          echo "Pull Request Number: ${{ steps.create_pr.outputs.pull_request_number }}"
+          echo "Created PR Number: ${{ steps.create_pr.outputs.pull_request_number }}"
