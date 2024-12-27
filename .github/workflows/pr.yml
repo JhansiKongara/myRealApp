@@ -3,7 +3,7 @@ name: Create PR on Commit
 on:
   push:
     branches:
-      - main # Trigger on commits to the 'main' branch
+      - develop # Trigger on commits to the 'main' branch
 
 permissions:
   contents: write
