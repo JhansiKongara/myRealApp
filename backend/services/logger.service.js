@@ -13,7 +13,6 @@ const transport = new winston.transports.DailyRotateFile({
   filename: path.join(logDirectory, "%DATE%.log"),
   datePattern: "YYYYMMDD",
   zippedArchive: true,
-  auditFile: "log",
   maxFiles: "3y",
   level: "info",
 });

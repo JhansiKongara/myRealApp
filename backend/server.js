@@ -41,7 +41,7 @@ redisClient.on("error", (err) => {
 // function isAuthorizedReq(req, res, next) {
 //   const token = req.header("Authorization");
 //   if (!token) {
-//     console.warn(
+//     logger.warn(
 //       `⚠️  Token not provided in request: ${req?.method} ${req?.originalUrl}`
 //     );
 //     return res.status(403).json({ message: "Access denied" });
@@ -49,7 +49,7 @@ redisClient.on("error", (err) => {
 
 //   jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
 //     if (err) {
-//       console.warn(
+//       logger.warn(
 //         `⚠️  Invalid token for request: ${req?.method} ${req?.originalUrl}`
 //       );
 //       return res.status(403).json({ message: "Invalid token" });
