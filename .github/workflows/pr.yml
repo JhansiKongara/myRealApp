@@ -3,7 +3,7 @@ name: Create PR on Commit
 on:
   push:
     branches:
-      - develop # Trigger on commits to the 'develop' branch
+      - develop
 
 permissions:
   contents: write
@@ -42,8 +42,8 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: develop # Source branch
-          base: main # Destination branch
+          branch: develop
+          base: main
           title: "Merge develop into main"
           body: "This PR was automatically created to merge changes from develop into main."
           labels: "automated"
@@ -54,37 +54,3 @@ jobs:
         if: steps.check_pr.outputs.pr_exists == 'false'
         run: |
           echo "Pull Request Number: ${{ steps.create_pr.outputs.pull_request_number }}"
-
-      - name: Add Labels to the Pull Request
-        if: steps.check_pr.outputs.pr_exists == 'false'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
-            if (!prNumber || prNumber === '0') {
-              throw new Error('Pull request number is invalid.');
-            }
-            console.log(`Adding labels to PR #${prNumber}`);
-            await github.rest.issues.addLabels({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-              labels: ['auto-generated', 'review-needed']
-            });
-
-      - name: Assign Reviewer to the Pull Request
-        if: steps.check_pr.outputs.pr_exists == 'false'
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
-            if (!prNumber || prNumber === '0') {
-              throw new Error('Pull request number is invalid.');
-            }
-            console.log(`Assigning reviewer to PR #${prNumber}`);
-            await github.rest.pulls.requestReviewers({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-              reviewers: ['JhansiKongara']
-            });
