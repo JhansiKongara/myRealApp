@@ -1,0 +1,45 @@
+name: Create PR on Commit
+
+on:
+  push:
+    branches:
+      - main # Trigger on commits to the 'main' branch
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create_pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Check for existing pull requests
+        id: check_pr
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              head: `${context.repo.owner}:main` // Check for PRs on the 'main' branch
+            });
+
+            if (prs.length > 0) {
+              core.setOutput('pr_exists', true);
+            } else {
+              core.setOutput('pr_exists', false);
+            }
+
+      - name: Create Pull Request
+        if: steps.check_pr.outputs.pr_exists == 'false'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: main # Source branch
+          title: "New Pull Request for Latest Commit"
+          body: "This PR was automatically created for the latest commit."
+          labels: "automated"
