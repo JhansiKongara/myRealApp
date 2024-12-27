@@ -30,11 +30,7 @@ jobs:
               base: 'main' // Destination branch
             });
 
-            if (prs.length > 0) {
-              core.setOutput('pr_exists', true);
-            } else {
-              core.setOutput('pr_exists', false);
-            }
+            core.setOutput('pr_exists', prs.length > 0 ? 'true' : 'false');
 
       - name: Create Pull Request
         if: steps.check_pr.outputs.pr_exists == 'false'
@@ -52,7 +48,7 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
+            const prNumber = parseInt(process.env.PR_NUMBER, 10);
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -65,10 +61,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
+            const prNumber = parseInt(process.env.PR_NUMBER, 10);
             await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber,
-              reviewers: ['JhansiKongara']  # Assigning reviewer
+              reviewers: ['JhansiKongara']  // Assigning reviewer
             });
