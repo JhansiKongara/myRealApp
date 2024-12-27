@@ -38,8 +38,8 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const conclusion = "${{ steps.eslint.outcome }}" === "success" ? "success" : "failure";
-            github.rest.repos.createCommitStatus({
+            const conclusion = steps.eslint.outcome === "success" ? "success" : "failure";
+            await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: context.payload.pull_request.head.sha, # Use pull request SHA
