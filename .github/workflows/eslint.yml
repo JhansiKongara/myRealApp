@@ -18,15 +18,30 @@ jobs:
         with:
           node-version: "18"
 
-      - name: Navigate to backend directory
-        run: cd backend
-
       - name: Install dependencies
-        run: |
-          cd backend
-          npm install --only=dev
+        working-directory: backend
+        run: npm install --only=dev
 
       - name: Run ESLint on backend
+        working-directory: backend
+        id: eslint
         run: |
-          cd backend
           npx eslint . --config .eslintrc.json --format=gha
+        continue-on-error: true
+
+      - name: Set GitHub commit status
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { conclusion } = github.context.payload.check_run || {};
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.sha,
+              state: conclusion === "success" ? "success" : "failure",
+              context: "ESLint (Backend)",
+              description: conclusion === "success" 
+                ? "All checks passed" 
+                : "ESLint checks failed",
+            });
