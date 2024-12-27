@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: read
-  statuses: write # Ensure the workflow can write commit statuses
+  statuses: write
 
 jobs:
   lint:
@@ -34,18 +34,19 @@ jobs:
         continue-on-error: true
 
       - name: Set GitHub commit status
-        if: always() # Ensure this step always runs
+        if: always()
         uses: actions/github-script@v6
         with:
           script: |
             const conclusion = steps.eslint.outcome === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request.head.sha;
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.payload.pull_request.head.sha, # Use pull request SHA
+              sha: sha,
               state: conclusion,
               context: "ESLint (Backend)",
-              description: conclusion === "success" 
-                ? "All checks passed" 
+              description: conclusion === "success"
+                ? "All checks passed"
                 : "ESLint checks failed",
             });
