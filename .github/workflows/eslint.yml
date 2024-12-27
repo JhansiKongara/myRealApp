@@ -34,12 +34,12 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const { conclusion } = github.context.payload.check_run || {};
+            const conclusion = steps.eslint.outcome === "success" ? "success" : "failure";
             github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: context.sha,
-              state: conclusion === "success" ? "success" : "failure",
+              state: conclusion,
               context: "ESLint (Backend)",
               description: conclusion === "success" 
                 ? "All checks passed" 
