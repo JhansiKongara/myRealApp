@@ -42,13 +42,15 @@ jobs:
           title: "Merge develop into main"
           body: "This PR was automatically created to merge changes from develop into main."
           labels: "automated"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Label the Pull Request
+      - name: Add Labels to the Pull Request
         if: steps.check_pr.outputs.pr_exists == 'false'
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = parseInt(process.env.PR_NUMBER, 10);
+            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -56,15 +58,15 @@ jobs:
               labels: ['auto-generated', 'review-needed']
             });
 
-      - name: Assign Reviewer to Pull Request
+      - name: Assign Reviewer to the Pull Request
         if: steps.check_pr.outputs.pr_exists == 'false'
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = parseInt(process.env.PR_NUMBER, 10);
+            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
             await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: prNumber,
-              reviewers: ['JhansiKongara']  // Assigning reviewer
+              reviewers: ['JhansiKongara']  # Assigning reviewer
             });
