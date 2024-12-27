@@ -50,7 +50,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = parseInt("${{ steps.create_pr.outputs.pull_request_number }}");
+            const prNumber = parseInt("${{ steps.create_pr.outputs.pull_request_number || '0' }}");
+            if (!prNumber || prNumber === 0) {
+              throw new Error('Pull request number is invalid.');
+            }
             await github.rest.issues.addLabels({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -63,7 +66,10 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = parseInt("${{ steps.create_pr.outputs.pull_request_number }}");
+            const prNumber = parseInt("${{ steps.create_pr.outputs.pull_request_number || '0' }}");
+            if (!prNumber || prNumber === 0) {
+              throw new Error('Pull request number is invalid.');
+            }
             await github.rest.pulls.requestReviewers({
               owner: context.repo.owner,
               repo: context.repo.repo,
