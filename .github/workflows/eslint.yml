@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+  statuses: write # Ensure the workflow can write commit statuses
+
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -30,7 +34,7 @@ jobs:
         continue-on-error: true
 
       - name: Set GitHub commit status
-        if: always()
+        if: always() # Ensure this step always runs
         uses: actions/github-script@v6
         with:
           script: |
@@ -38,7 +42,7 @@ jobs:
             github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              sha: context.sha,
+              sha: context.payload.pull_request.head.sha, # Use pull request SHA
               state: conclusion,
               context: "ESLint (Backend)",
               description: conclusion === "success" 
