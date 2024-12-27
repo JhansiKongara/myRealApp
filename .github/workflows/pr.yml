@@ -3,7 +3,7 @@ name: Create PR on Commit
 on:
   push:
     branches:
-      - develop  # Trigger on commits to the 'develop' branch
+      - develop # Trigger on commits to the 'develop' branch
 
 permissions:
   contents: write
@@ -42,25 +42,26 @@ jobs:
         id: create_pr
         uses: peter-evans/create-pull-request@v5
         with:
-          branch: develop  # Source branch
-          base: main       # Destination branch
-          title: 'Merge develop into main'
-          body: 'This PR was automatically created to merge changes from develop into main.'
-          labels: 'automated'
+          branch: develop # Source branch
+          base: main # Destination branch
+          title: "Merge develop into main"
+          body: "This PR was automatically created to merge changes from develop into main."
+          labels: "automated"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Debug PR Number
         if: steps.check_pr.outputs.pr_exists == 'false'
-        run: echo "Pull Request Number: ${{ steps.create_pr.outputs.pull_request_number }}"
+        run: |
+          echo "Pull Request Number: ${{ steps.create_pr.outputs.pull_request_number }}"
 
       - name: Add Labels to the Pull Request
         if: steps.check_pr.outputs.pr_exists == 'false'
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = parseInt("${{ steps.create_pr.outputs.pull_request_number || '0' }}");
-            if (!prNumber || prNumber === 0) {
+            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
+            if (!prNumber || prNumber === '0') {
               throw new Error('Pull request number is invalid.');
             }
             console.log(`Adding labels to PR #${prNumber}`);
@@ -76,8 +77,8 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const prNumber = parseInt("${{ steps.create_pr.outputs.pull_request_number || '0' }}");
-            if (!prNumber || prNumber === 0) {
+            const prNumber = ${{ steps.create_pr.outputs.pull_request_number }};
+            if (!prNumber || prNumber === '0') {
               throw new Error('Pull request number is invalid.');
             }
             console.log(`Assigning reviewer to PR #${prNumber}`);
