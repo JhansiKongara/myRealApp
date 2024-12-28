@@ -49,11 +49,11 @@ jobs:
                 : "Some checks failed",
             });
 
-  approval:
-    needs: lint
-    runs-on: ubuntu-latest
-    environment:
-      name: owner-approval
-    steps:
-      - name: Notify for owner approval
-        run: echo "Waiting for owner approval to proceed."
+  # approval:
+  #   needs: lint
+  #   runs-on: ubuntu-latest
+  #   environment:
+  #     name: owner-approval
+  #   steps:
+  #     - name: Notify for owner approval
+  #       run: echo "Waiting for owner approval to proceed."
