@@ -8,6 +8,7 @@ on:
 permissions:
   contents: read
   statuses: write
+  pull-requests: write # Required for merging PRs
 
 jobs:
   lint:
@@ -50,3 +51,26 @@ jobs:
                 ? "All checks passed"
                 : "ESLint checks failed",
             });
+
+  auto-merge:
+    needs: lint
+    if: ${{ needs.lint.result == 'success' }} # Only run if linting is successful
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Automatically merge pull request
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (pr) {
+              await github.rest.pulls.merge({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                merge_method: "squash" // Use "merge" or "rebase" if needed
+              });
+              console.log(`Merged pull request #${pr.number}`);
+            } else {
+              console.log("No pull request context available.");
+            };
