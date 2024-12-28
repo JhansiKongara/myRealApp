@@ -60,7 +60,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 pull_number: context.payload.pull_request.number,
-                event: 'APPROVE',
+                event: 'COMMENT',
                 body: 'ESLint passed with no issues!',
               });
             }
