@@ -30,7 +30,7 @@ jobs:
         working-directory: backend
         id: eslint
         run: |
-          npx eslint . --config .eslintrc.json --format=gha
+          npx eslint . --config . --format=gha
         continue-on-error: true
 
       - name: Set GitHub commit status
