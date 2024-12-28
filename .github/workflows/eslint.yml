@@ -33,26 +33,21 @@ jobs:
           npx eslint . --config .eslintrc.json --format=json -o eslint-results.json || true
 
       - name: Annotate ESLint Issues
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: backend/eslint-results.json
-
-      - name: Post Review Based on ESLint
         uses: actions/github-script@v6
         with:
           script: |
             const fs = require('fs');
             const results = JSON.parse(fs.readFileSync('backend/eslint-results.json', 'utf8'));
 
-            if (results.length > 0) {
-              const comments = results.map(issue => {
-                return {
-                  path: issue.filePath.replace(process.cwd(), ''),
-                  line: issue.messages[0].line,
-                  body: `ESLint issue: ${issue.messages[0].message} (${issue.messages[0].ruleId})`
-                };
-              });
+            const comments = results.flatMap(result => 
+              result.messages.map(message => ({
+                path: result.filePath.replace(process.cwd() + '/', ''),
+                line: message.line,
+                body: `ESLint issue: ${message.message} (${message.ruleId})`,
+              }))
+            );
 
+            if (comments.length > 0) {
               await github.rest.pulls.createReview({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
