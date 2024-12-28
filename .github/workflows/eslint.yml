@@ -1,4 +1,4 @@
-name: ESLint and Owner Approval
+name: ESLint Review
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: write
-  statuses: write
+  pull-requests: write
 
 jobs:
   lint:
@@ -30,30 +30,42 @@ jobs:
         working-directory: backend
         id: eslint
         run: |
-          npx eslint . --config .eslintrc.json --format=gha
-        continue-on-error: true
+          npx eslint . --config .eslintrc.json --format=json -o eslint-results.json || true
 
-      - name: Set GitHub commit status
+      - name: Annotate ESLint Issues
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: backend/eslint-results.json
+
+      - name: Post Review Based on ESLint
         uses: actions/github-script@v6
         with:
           script: |
-            const sha = context.payload.pull_request.head.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: sha,
-              state: "${{ steps.eslint.outcome }}" === "success" ? "success" : "failure",
-              context: "ESLint (Backend)",
-              description: "${{ steps.eslint.outcome }}" === "success"
-                ? "All checks passed"
-                : "Some checks failed",
-            });
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('backend/eslint-results.json', 'utf8'));
 
-  approval:
-    needs: lint
-    runs-on: ubuntu-latest
-    environment:
-      name: owner-approval
-    steps:
-      - name: Notify for owner approval
-        run: echo "Waiting for owner approval to proceed."
+            if (results.length > 0) {
+              const comments = results.map(issue => {
+                return {
+                  path: issue.filePath.replace(process.cwd(), ''),
+                  line: issue.messages[0].line,
+                  body: `ESLint issue: ${issue.messages[0].message} (${issue.messages[0].ruleId})`
+                };
+              });
+
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: 'COMMENT',
+                comments,
+              });
+            } else {
+              await github.rest.pulls.createReview({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: context.payload.pull_request.number,
+                event: 'APPROVE',
+                body: 'ESLint passed with no issues!',
+              });
+            }
