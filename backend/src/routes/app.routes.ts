@@ -1,6 +1,6 @@
-const express = require("express");
-const userRouter = require("./userRoutes");
-const { logger } = require("../services/logger.service");
+import express from "express";
+import userRouter from "./userRoutes";
+import { logger } from "../services/logger.service";
 
 const appRouter = express.Router();
 
@@ -18,4 +18,4 @@ appRouter.use(
   userRouter
 );
 
-module.exports = appRouter;
+export = appRouter;
