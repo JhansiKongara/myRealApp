@@ -1,4 +1,4 @@
-name: ESLint (Backend)
+name: ESLint and Owner Approval
 
 on:
   pull_request:
@@ -49,23 +49,11 @@ jobs:
                 : "Some checks failed",
             });
 
-  auto-merge:
+  approval:
     needs: lint
     runs-on: ubuntu-latest
+    environment:
+      name: owner-approval
     steps:
-      - name: Automatically merge pull request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const pr = context.payload.pull_request;
-            if (!pr) {
-              throw new Error("No pull request context available.");
-            }
-            await github.rest.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              merge_method: "squash",
-            });
+      - name: Notify for owner approval
+        run: echo "Waiting for owner approval to proceed."
