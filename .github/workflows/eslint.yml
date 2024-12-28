@@ -1,4 +1,4 @@
-name: ESLint Review
+name: ESLint and Owner Approval
 
 on:
   pull_request:
@@ -7,7 +7,7 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
+  statuses: write
 
 jobs:
   lint:
@@ -30,37 +30,30 @@ jobs:
         working-directory: backend
         id: eslint
         run: |
-          npx eslint . --config .eslintrc.json --format=json -o eslint-results.json || true
+          npx eslint . --config .eslintrc.json --format=gha
+        continue-on-error: true
 
-      - name: Annotate ESLint Issues
+      - name: Set GitHub commit status
         uses: actions/github-script@v6
         with:
           script: |
-            const fs = require('fs');
-            const results = JSON.parse(fs.readFileSync('backend/eslint-results.json', 'utf8'));
+            const sha = context.payload.pull_request.head.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha,
+              state: "${{ steps.eslint.outcome }}" === "success" ? "success" : "failure",
+              context: "ESLint (Backend)",
+              description: "${{ steps.eslint.outcome }}" === "success"
+                ? "All checks passed"
+                : "Some checks failed",
+            });
 
-            const comments = results.flatMap(result => 
-              result.messages.map(message => ({
-                path: result.filePath.replace(process.cwd() + '/', ''),
-                line: message.line,
-                body: `ESLint issue: ${message.message} (${message.ruleId})`,
-              }))
-            );
-
-            if (comments.length > 0) {
-              await github.rest.pulls.createReview({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                event: 'COMMENT',
-                comments,
-              });
-            } else {
-              await github.rest.pulls.createReview({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                pull_number: context.payload.pull_request.number,
-                event: 'COMMENT',
-                body: 'ESLint passed with no issues!',
-              });
-            }
+  approval:
+    needs: lint
+    runs-on: ubuntu-latest
+    environment:
+      name: owner-approval
+    steps:
+      - name: Notify for owner approval
+        run: echo "Waiting for owner approval to proceed."
