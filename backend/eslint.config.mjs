@@ -9,17 +9,18 @@ import typescript from "@typescript-eslint/eslint-plugin";
 export default [
   {
     files: ["**/*.{js,mjs,cjs,ts}"],
+    ignores: ["eslint.*"],
     plugins: {
       "function-name": functionName,
       "@cspell": cspell,
       typescript,
     },
     languageOptions: {
-      parser: "@typescript-eslint/parser", // Ensure using the TypeScript parser
+      parser: "@typescript-eslint/parser",
       ecmaVersion: 2020,
       sourceType: "module",
       parserOptions: {
-        project: "./tsconfig.json", // Correct place for the project option
+        project: "./tsconfig.json",
       },
     },
     rules: {

@@ -3,7 +3,7 @@ import dotEnv from "dotenv";
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
-import redis from "redis";
+// import redis from "redis";
 import path from "path";
 const envPath = path.join(__dirname, `.env.${process.env.NODE_ENV}`);
 dotEnv.config({ path: envPath });
