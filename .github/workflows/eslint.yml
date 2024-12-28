@@ -33,6 +33,23 @@ jobs:
           npx eslint . --config .eslintrc.json --format=gha
         continue-on-error: true
 
+      - name: Set GitHub commit status
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const conclusion = "${{ steps.eslint.outcome }}" === "success" ? "success" : "failure";
+            const sha = context.payload.pull_request.head.sha;
+            await github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha,
+              state: conclusion,
+              context: "ESLint (Backend)",
+              description: conclusion === "success"
+                ? "All checks passed"
+                : "ESLint checks failed",
+            });
+
   auto-merge:
     needs: lint
     if: ${{ needs.lint.result == 'success' }}
@@ -42,21 +59,44 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Automatically merge pull request
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+      - name: Wait for "ESLint (Backend)" to pass
         uses: actions/github-script@v6
         with:
           script: |
             const pr = context.payload.pull_request;
-            if (pr) {
-              await github.rest.pulls.merge({
+            if (!pr) {
+              throw new Error("No pull request context available.");
+            }
+            let status;
+            do {
+              status = await github.rest.repos.getCombinedStatusForRef({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                pull_number: pr.number,
-                merge_method: "squash" // Options: squash, merge, rebase
+                ref: pr.head.sha,
               });
-              console.log(`Successfully merged pull request #${pr.number}`);
-            } else {
-              console.log("No pull request context available.");
+              const backendStatus = status.data.statuses.find(s => s.context === "ESLint (Backend)");
+              if (backendStatus && backendStatus.state === "success") {
+                console.log("Status check passed.");
+                break;
+              }
+              console.log("Waiting for status check...");
+              await new Promise(resolve => setTimeout(resolve, 15000));
+            } while (true);
+
+      - name: Automatically merge pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              throw new Error("No pull request context available.");
             }
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              merge_method: "squash",
+            });
+            console.log(`Successfully merged pull request #${pr.number}`);
