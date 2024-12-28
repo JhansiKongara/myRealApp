@@ -6,8 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read
-  statuses: write
+  contents: write
   pull-requests: write
 
 jobs:
@@ -34,33 +33,18 @@ jobs:
           npx eslint . --config .eslintrc.json --format=gha
         continue-on-error: true
 
-      - name: Set GitHub commit status
-        if: always()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const conclusion = "${{ steps.eslint.outcome }}" === "success" ? "success" : "failure";
-            const sha = context.payload.pull_request.head.sha;
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: sha,
-              state: conclusion,
-              context: "ESLint (Backend)",
-              description: conclusion === "success"
-                ? "All checks passed"
-                : "ESLint checks failed",
-            });
-
   auto-merge:
     needs: lint
     if: ${{ needs.lint.result == 'success' }}
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Automatically merge pull request
         env:
-          PAT: ${{ secrets.PAT }} # Use the secret PAT added to the repository
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         uses: actions/github-script@v6
         with:
           script: |
