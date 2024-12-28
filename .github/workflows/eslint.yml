@@ -6,7 +6,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
   statuses: write
 
 jobs:
@@ -26,7 +26,7 @@ jobs:
         working-directory: backend
         run: npm install --only=dev
 
-      - name: Run ESLint on backend
+      - name: Run ESLint
         working-directory: backend
         id: eslint
         run: |
@@ -34,19 +34,38 @@ jobs:
         continue-on-error: true
 
       - name: Set GitHub commit status
-        if: always()
         uses: actions/github-script@v6
         with:
           script: |
-            const conclusion = "${{ steps.eslint.outcome }}" === "success" ? "success" : "failure";
             const sha = context.payload.pull_request.head.sha;
             await github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: sha,
-              state: conclusion,
+              state: "${{ steps.eslint.outcome }}" === "success" ? "success" : "failure",
               context: "ESLint (Backend)",
-              description: conclusion === "success"
+              description: "${{ steps.eslint.outcome }}" === "success"
                 ? "All checks passed"
-                : "ESLint checks failed",
+                : "Some checks failed",
+            });
+
+  auto-merge:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Automatically merge pull request
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            if (!pr) {
+              throw new Error("No pull request context available.");
+            }
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: pr.number,
+              merge_method: "squash",
             });
