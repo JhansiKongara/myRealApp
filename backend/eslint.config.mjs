@@ -4,6 +4,7 @@ import tseslint from "typescript-eslint";
 import functionName from "eslint-plugin-function-name";
 import cspell from "@cspell/eslint-plugin";
 import typescript from "@typescript-eslint/eslint-plugin";
+import sonarjs from "eslint-plugin-sonarjs";
 
 /** @type {import('eslint').Linter.FlatConfig[]} */
 export default [
@@ -14,6 +15,7 @@ export default [
       "function-name": functionName,
       "@cspell": cspell,
       typescript,
+      sonarjs,
     },
     languageOptions: {
       parser: "@typescript-eslint/parser",
@@ -141,6 +143,16 @@ export default [
       "@typescript-eslint/no-empty-interface": "error",
       "@typescript-eslint/no-floating-promises": "error",
       "@typescript-eslint/consistent-type-imports": "error",
+      "sonarjs/cognitive-complexity": ["error", 15],
+      "sonarjs/no-duplicate-string": "error",
+      "sonarjs/no-identical-functions": "error",
+      "sonarjs/no-collapsible-if": "error",
+      "sonarjs/no-redundant-boolean": "error",
+      "sonarjs/no-inverted-boolean-check": "error",
+      "sonarjs/prefer-immediate-return": "error",
+      "sonarjs/no-small-switch": "error",
+      "sonarjs/no-unused-collection": "warn",
+      "sonarjs/prefer-single-boolean-return": "error",
     },
   },
   { files: ["**/*.js"], languageOptions: { sourceType: "commonjs" } },
