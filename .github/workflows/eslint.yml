@@ -1,4 +1,4 @@
-name: ESLint (Backend)
+name: ESLint and Owner Approval
 
 on:
   pull_request:
@@ -30,7 +30,7 @@ jobs:
         working-directory: backend
         id: eslint
         run: |
-          npx eslint . --config .eslintrc.json --format=gha
+          npx eslint . --config ./eslint.config.mjs --format=gha
         continue-on-error: true
 
       - name: Set GitHub commit status
@@ -47,25 +47,4 @@ jobs:
               description: "${{ steps.eslint.outcome }}" === "success"
                 ? "All checks passed"
                 : "Some checks failed",
-            });
-
-  auto-merge:
-    needs: lint
-    runs-on: ubuntu-latest
-    steps:
-      - name: Automatically merge pull request
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const pr = context.payload.pull_request;
-            if (!pr) {
-              throw new Error("No pull request context available.");
-            }
-            await github.rest.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: pr.number,
-              merge_method: "squash",
             });

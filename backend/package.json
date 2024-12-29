@@ -1,43 +1,45 @@
 {
-  "name": "myrealapp",
+  "name": "backend.ts",
   "version": "1.0.0",
-  "description": "this server provides rest API's for MyRealApp.",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "NODE_ENV=development npx nodemon server.js",
-    "test": "jest",
-    "lint": "eslint . --fix"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "cross-env NODE_ENV=development nodemon -r ts-node src/index.ts"
   },
-  "keywords": [
-    "myRealApp"
-  ],
-  "author": "Raja",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/morgan": "^1.9.9",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "eslint-plugin-function-name": "^2.0.3",
     "express": "^4.21.2",
-    "joi": "^17.13.3",
-    "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "nodemon": "^3.1.7",
-    "pg": "^8.13.1",
     "redis": "^4.7.0",
     "winston": "^3.17.0",
     "winston-daily-rotate-file": "^5.0.0"
   },
   "devDependencies": {
     "@cspell/eslint-plugin": "^8.17.1",
-    "eslint": "^8.54.0",
-    "eslint-config-standard": "^17.1.0",
+    "@eslint/js": "^9.17.0",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.2",
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-formatter-gha": "^1.5.2",
-    "eslint-plugin-function-name": "^2.0.3",
-    "eslint-plugin-import": "^2.31.0",
-    "eslint-plugin-jest": "^28.10.0",
-    "eslint-plugin-n": "^16.6.2",
-    "eslint-plugin-promise": "^6.6.0",
-    "eslint-plugin-react": "^7.37.3",
-    "eslint-plugin-react-hooks": "^5.1.0"
+    "eslint-plugin-sonarjs": "^3.0.1",
+    "globals": "^15.14.0",
+    "nodemon": "^3.1.9",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2",
+    "typescript-eslint": "^8.18.2"
   }
 }
